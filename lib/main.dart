@@ -1,27 +1,52 @@
+import 'package:chat_app/all_users_screen.dart';
+import 'package:chat_app/home_page.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flash_chat/screens/welcome_screen.dart';
-import 'package:flash_chat/screens/login_screen.dart';
-import 'package:flash_chat/screens/registration_screen.dart';
-import 'package:flash_chat/screens/chat_screen.dart';
 
-void main() => runApp(FlashChat());
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class FlashChat extends StatelessWidget {
+void main() => runApp(MyApp());
+
+class MyApp extends StatefulWidget {
+  @override
+  MyAppState createState() {
+    return new MyAppState();
+  }
+}
+
+class MyAppState extends State<MyApp> {
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  GoogleSignIn googleSignIn = GoogleSignIn();
+  bool isLoggedIn = false;
+
+  void isSignedIn() async {
+    if (await googleSignIn.isSignedIn()) {
+      setState(() {
+        isLoggedIn = true;
+      });
+    } else {
+      setState(() {
+        isLoggedIn = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isSignedIn();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark().copyWith(
-        textTheme: TextTheme(
-          bodyText1: TextStyle(color: Colors.black54),
-        ),
-      ),
-      initialRoute: 'welcome_screen',
-      routes: {
-        'welcome_screen':(context)=> WelcomeScreen(),
-        'login_screen':(context)=> LoginScreen(),
-        'registration_screen':(context)=> RegistrationScreen(),
-        'chat_screen':(context)=> ChatScreen(),
+      title: "Chat App",
+      theme: ThemeData(primarySwatch: Colors.red),
+      routes: <String, WidgetBuilder>{
+        '/chatscreen': (BuildContext context) => new AllUsersScreen(),
       },
+      home: isLoggedIn == true ? AllUsersScreen() : HomePage(),
     );
   }
 }
